@@ -1,0 +1,500 @@
+import tkinter as tk
+from tkinter import ttk
+import pyperclip
+
+# Dicionários para cada opção da interface
+volumes = {
+    "VOLUME": "",
+    "01": "01- ",
+    "02": "02- ",
+    "03": "03- ",
+    "04": "04- ",
+    "05": "05- ",
+    "06": "06- ",
+    "07": "07- ",
+    "08": "08- ",
+    "09": "09- ",
+    "10": "10- ",
+}
+
+# Zona Norte
+zona_norte = {
+    "NORTE": "",
+    "Abolição": "Abolição- ",
+    "Anchieta": "Anchieta- ",
+    "Andaraí": "Andaraí- ",
+    "Bancários": "Bancários- ",
+    "Bento Ribeiro": "Bento Ribeiro- ",
+    "Bonsucesso": "Bonsucesso- ",
+    "Brás de Pina": "Brás de Pina- ",
+    "Cachambi": "Cachambi- ",
+    "Cacuia": "Cacuia- ",
+    "Cascadura": "Cascadura- ",
+    "Cavalcanti": "Cavalcanti- ",
+    "Cidade Universitária": "Cidade Universitária- ",
+    "Colégio": "Colégio- ",
+    "Cordovil": "Cordovil- ",
+    "Del Castilho": "Del Castilho- ",
+    "Encantado": "Encantado- ",
+    "Engenho de Dentro": "Engenho de Dentro- ",
+    "Engenho Novo": "Engenho Novo- ",
+    "Freguesia": "Freguesia- ",
+    "Galeão": "Galeão- ",
+    "Grajaú": "Grajaú- ",
+    "Guadalupe": "Guadalupe- ",
+    "Honório Gurgel": "Honório Gurgel- ",
+    "Inhaúma": "Inhaúma- ",
+    "Irajá": "Irajá- ",
+    "Jardim Carioca": "Jardim Carioca- ",
+    "Jardim Guanabara": "Jardim Guanabara- ",
+    "Madureira": "Madureira- ",
+    "Manguinhos": "Manguinhos- ",
+    "Maracanã": "Maracanã- ",
+    "Marechal Hermes": "Marechal Hermes- ",
+    "Maria da Graça": "Maria da Graça- ",
+    "Méier": "Méier- ",
+    "Moneró": "Moneró- ",
+    "Olaria": "Olaria- ",
+    "Oswaldo Cruz": "Oswaldo Cruz- ",
+    "Parque Anchieta": "Parque Anchieta- ",
+    "Pavuna": "Pavuna- ",
+    "Penha Circular": "Penha Circular- ",
+    "Penha": "Penha- ",
+    "Piedade": "Piedade- ",
+    "Pilares": "Pilares- ",
+    "Portuguesa": "Portuguesa- ",
+    "Praça da Bandeira": "Praça da Bandeira- ",
+    "Quintino Bocaiuva": "Quintino Bocaiuva- ",
+    "Ramos": "Ramos- ",
+    "Riachuelo": "Riachuelo- ",
+    "Ricardo de Albuquerque": "Ricardo de Albuquerque- ",
+    "Rocha Miranda": "Rocha Miranda- ",
+    "Rocha": "Rocha- ",
+    "Sampaio": "Sampaio- ",
+    "São Francisco Xavier": "São Francisco Xavier- ",
+    "Tauá": "Tauá- ",
+    "Tijuca": "Tijuca- ",
+    "Todos os Santos": "Todos os Santos- ",
+    "Vicente de Carvalho": "Vicente de Carvalho- ",
+    "Vila da Penha": "Vila da Penha- ",
+    "Vila Isabel": "Vila Isabel- ",
+    "Vila Kosmos": "Vila Kosmos- ",
+    "Vista Alegre": "Vista Alegre- ",
+}
+
+# Zona Sul
+zona_sul = {
+    "SUL": "",
+    "Botafogo": "Botafogo- ",
+    "Catete": "Catete- ",
+    "Copacabana": "Copacabana- ",
+    "Cosme Velho": "Cosme Velho- ",
+    "Flamengo": "Flamengo- ",
+    "Gávea": "Gávea- ",
+    "Glória": "Glória- ",
+    "Humaitá": "Humaitá- ",
+    "Ipanema": "Ipanema- ",
+    "Jardim Botânico": "Jardim Botânico- ",
+    "Lagoa": "Lagoa- ",
+    "Laranjeiras": "Laranjeiras- ",
+    "Leblon": "Leblon- ",
+    "Leme": "Leme- ",
+    "Rocinha": "Rocinha- ",
+    "São Conrado": "São Conrado- ",
+    "Urca": "Urca- ",
+    "Vidigal": "Vidigal- ",
+}
+
+
+# Zona Oeste
+zona_oeste = {
+    "OESTE": "",
+    "Bangu": "Bangu- ",
+    "Barra da Tijuca": "Barra da Tijuca- ",
+    "Camorim": "Camorim- ",
+    "Campo Grande": "Campo Grande- ",
+    "Cosmos": "Cosmos- ",
+    "Curicica": "Curicica- ",
+    "Deodoro": "Deodoro- ",
+    "Freguesia de Jacarepaguá": "Freguesia de Jacarepaguá- ",
+    "Inhoaíba": "Inhoaíba- ",
+    "Itanhangá": "Itanhangá- ",
+    "Jacarepaguá": "Jacarepaguá- ",
+    "Jardim Sulacap": "Jardim Sulacap- ",
+    "Joá": "Joá- ",
+    "Paciência": "Paciência- ",
+    "Pechincha": "Pechincha- ",
+    "Realengo": "Realengo- ",
+    "Recreio dos Bandeirantes": "Recreio dos Bandeirantes- ",
+    "Rio das Pedras": "Rio das Pedras- ",
+    "Santa Cruz": "Santa Cruz- ",
+    "Santíssimo": "Santíssimo- ",
+    "Tanque": "Tanque- ",
+    "Taquara": "Taquara- ",
+    "Vargem Grande": "Vargem Grande- ",
+    "Vargem Pequena": "Vargem Pequena- ",
+    "Vila Valqueire": "Vila Valqueire- ",
+}
+
+# Centro
+centro = {
+    "CENTRO": "",
+    "Benfica": "Benfica- ",
+    "Caju": "Caju- ",
+    "Cidade Nova": "Cidade Nova- ",
+    "Estácio": "Estácio- ",
+    "Gamboa": "Gamboa- ",
+    "Lapa": "Lapa- ",
+    "Mangueira": "Mangueira- ",
+    "Rio Comprido": "Rio Comprido- ",
+    "Santa Teresa": "Santa Teresa- ",
+    "Santo Cristo": "Santo Cristo- ",
+    "São Cristóvão": "São Cristóvão- ",
+    "Saúde": "Saúde- ",
+    "Vasco da Gama": "Vasco da Gama- ",
+}
+
+# Niteroi
+niteroi = {
+    "NITERÓI": "",
+    "Badu": "Badu- ",
+    "Barreto": "Barreto- ",
+    "Camboinhas": "Camboinhas- ",
+    "Fonseca": "Fonseca- ",
+    "Icarai": "Icarai- ",
+    "Ilha da Conceição": "Ilha da Conceição- ",
+    "Itaipu": "Itaipu- ",
+    "Itaipuaçu": "Itaipuaçu- ",
+    "Maria Paula": "Maria Paula- ",
+    "Pendotiba": "Pendotiba- ",
+    "Piratininga": "Piratininga- ",
+    "Rio do Ouro": "Rio do Ouro- ",
+    "Santa Rosa": "Santa Rosa- ",
+    "São Francisco": "São Francisco- ",
+    "Serra Grande": "Serra Grande- ",
+    "Vazea das Moças": "Vazea das Moças- ",
+}
+
+# Baixada
+baixada = {
+    "BAIXADA": "",
+    "Austin": "Austin- ",
+    "Belford Roxo": "Belford Roxo- ",
+    "Cabuçu": "Cabuçu- ",
+    "Campo Alegre": "Campo Alegre- ",
+    "Comendador Soares": "Comendador Soares- ",
+    "Duque de Caxias": "Duque de Caxias- ",
+    "Duque": "Duque- ",
+    "Gramacho": "Gramacho- ",
+    "Guapimirim": "Guapimirim- ",
+    "Itaguaí": "Itaguaí- ",
+    "Japeri": "Japeri- ",
+    "Jardim Gramacho": "Jardim Gramacho- ",
+    "Magé": "Magé- ",
+    "Mesquita": "Mesquita- ",
+    "Nilópolis": "Nilópolis- ",
+    "Nova Iguaçu": "Nova Iguaçu- ",
+    "Paracambi": "Paracambi- ",
+    "Queimados": "Queimados- ",
+    "Santa Cruz da Serra": "Santa Cruz da Serra- ",
+    "Santa Ritta": "Santa Ritta- ",
+    "São João de Meriti": "São João de Meriti- ",
+    "São Joao": "São Joao- ",
+    "Seropédica": "Seropédica- ",
+    "Xerem": "Xerem- ",
+}
+
+#Nota Protocolo
+nota_protocolo = {
+    "NOTA/PROTOCOLO": "",
+    "Nota PL": "Nota(s):42.XXX- ",
+    "Nota BD": "Nota(s):4.XXX- ",
+    "Protocolo": "XXXXX- ",
+}
+
+# Clientes Platinum
+clientes_platinum = {
+    "CLIENTES PL": "",
+    "Arezzo": "Arezzo- ",
+    "Associação Santa Catarina": "Associação Santa Catarina- ",
+    "Benthic": "Benthic- ",
+    "Benthic": "Benthic- ",
+    "Brasil Center": "Brasil Center- ",
+    "British School": "British School- ",
+    "CGG do Brasil": "CGG do Brasil- ",
+    "Citycol": "Citycol- ",
+    "Claro": "Claro- ",
+    "Concrejato": "Concrejato- ",
+    "Constellation": "Constellation- ",
+    "Contek": "Contek- ",
+    "Cyrela": "Cyrela- ",
+    "DAVITA": "DAVITA- ",
+    "Esho Empresa": "Esho Empresa- ",
+    "FACC": "FACC- ",
+    "Farm": "Farm- ",
+    "FioTec": "FioTec- ",
+    "FMC": "FMC- ",
+    "Globo": "Globo- ",
+    "Grupo Soma": "Grupo Soma- ",
+    "GSK": "GSK- ",
+    "HTK Lentes": "HTK Lentes- ",
+    "Ipiranga": "Ipiranga- ",
+    "Knauf": "Knauf- ",
+    "Lillo do Brasil": "Lillo do Brasil- ",
+    "Litografia": "Litografia- ",
+    "Marine": "Marine- ",
+    "Melhor Envio Jad Log": "Melhor Envio Jad Log- ",
+    "Melhor envio Loggi": "Melhor envio Loggi- ",
+    "Multi Optica": "Multi Optica- ",
+    "Multi-Rio": "Multi-Rio- ",
+    "ONCORIO": "ONCORIO- ",
+    "Orgalent": "Orgalent- ",
+    "Petroleo": "Petróleo- ",
+    "PF Consumer": "PF Consumer- ",
+    "PMI South": "PMI South- ",
+    "Profarma": "Profarma- ",
+    "Prudential": "Prudential- ",
+    "Record": "Record- ",
+    "Rede Dor - Hosp Esperança": "Rede Dor - Hosp Esperança- ",
+    "SENAC": "SENAC- ",
+    "SESC": "SESC- ",
+    "Stone": "Stone- ",
+    "Vem Conveniência": "Vem Conveniência- ",
+    "Warner Music": "Warner Music- ",
+}
+
+
+# Clientes Beleza Divina
+clientes_beleza_divina = {
+    "CLIENTES BD": "",
+    "Adriana de Souza": "Adriana de Souza- ",
+    "Alessandra Goulart": "Alessandra Goulart- ",
+    "Alexander Meireles": "Alexander Meireles- ",
+    "Brenda Loiza": "Brenda Loiza- ",
+    "Bianca Araujo": "Bianca Araujo- ",
+    "Bianca Souza": "Bianca Souza- ",
+    "Gisele Torres": "Gisele Torres- ",
+    "Janaíne Silva": "Janaíne Silva- ",
+    "Kauanne dos Santos": "Kauanne dos Santos- ",    
+    "Larissa de Cássia": "Larissa de Cássia- ",
+    "Luciana Lima": "Luciana Lima- ",
+    "Luiz Henrique": "Luiz Henrique- ",
+    "Marcela Alves": "Marcela Alves- ",
+    "Marcelo Lemos": "Marcelo Lemos- ",
+    "Mylena Ney": "Mylena Ney- ",
+    "Nilma": "Nilma- ",
+    "Paula Kelly": "Paula Kelly- ",
+    "Sheila Albuquerque": "Sheila Albuquerque- ",
+    "Simone Soares": "Simone Soares- ",
+    "Ursula": "Ursula- ",
+    "Vivian Cardozo": "Vivian Cardozo- ",
+    "Viviane Burlamaqui": "Viviane Burlamaqui- ",
+    "xxx": "xxx- ",
+}
+
+
+#Empresa/Origem
+empresa_origem = {
+    "EMPRESA/ORIGEM": "",
+    "PLATINUM": "PL ",
+    "BELEZA DIVINA": "BD "
+}
+
+# Dicionário de itens consolidado
+opcoes_texto = {**volumes, **zona_norte, **zona_sul, **zona_oeste, **centro, **niteroi, **baixada, **nota_protocolo, **clientes_platinum, **clientes_beleza_divina, **empresa_origem}
+
+# Valores padrão
+valores_padrao = {
+    "VOLUME": "VOLUME",
+    "NORTE": "NORTE",
+    "SUL": "SUL",
+    "OESTE": "OESTE",
+    "CENTRO": "CENTRO",
+    "NITERÓI": "NITERÓI",
+    "BAIXADA": "BAIXADA",
+    "CLIENTES PL": "EMP/ORIGEM",
+    "CLIENTES BD": "NOTA/PROTOCOLO",
+    "NOTA/PROT": "CLIENTES PL",
+    "EMP/ORIGEM": "CLIENTES BD",
+}
+
+#MENSAGEM BOM DIA
+def mensagem_bom_dia():
+    caixa_resultado.delete('1.0', tk.END)
+    caixa_resultado.insert(tk.END, "Bom dia a todos. \nEntregas de hoje - 10/01 \nPlatinum/ Beleza Divina")
+
+
+def carregar_valores_padrao():
+    for var, valor_padrao in zip([var_opcao1, var_opcao2_norte, var_opcao2_sul, var_opcao2_oeste, var_opcao2_centro, var_opcao2_niteroi,
+                                  var_opcao2_baixada,  # Adicione esta variável
+                                  var_opcao3, var_opcao4, var_opcao5, var_opcao_bd],
+                                 valores_padrao.values()):
+        var.set(valor_padrao)
+
+def obter_resultado():
+    # Limpar todas as opções para remover destaque anterior
+    for combo_box in [menu_opcao1, menu_opcao2_norte, menu_opcao2_sul, menu_opcao2_oeste, menu_opcao2_centro, menu_opcao2_niteroi,
+                      menu_opcao2_baixada,  # Adicione esta variável
+                      menu_opcao3, menu_opcao4, menu_opcao5, menu_opcao_bd]:
+        combo_box.configure(foreground="black") 
+
+    opcao1 = opcoes_texto.get(var_opcao1.get(), "")
+    opcao2_norte = opcoes_texto.get(var_opcao2_norte.get(), "")
+    opcao2_sul = opcoes_texto.get(var_opcao2_sul.get(), "")
+    opcao2_oeste = opcoes_texto.get(var_opcao2_oeste.get(), "")
+    opcao2_centro = opcoes_texto.get(var_opcao2_centro.get(), "")
+    opcao2_niteroi = opcoes_texto.get(var_opcao2_niteroi.get(), "")
+    opcao2_baixada = opcoes_texto.get(var_opcao2_baixada.get(), "")  # Adicione esta linha
+    opcao3 = opcoes_texto.get(var_opcao3.get(), "")
+    opcao4 = opcoes_texto.get(var_opcao4.get(), "")
+    opcao5 = opcoes_texto.get(var_opcao5.get(), "")
+    opcao_bd = opcoes_texto.get(var_opcao_bd.get(), "")  # Nova opção "BD"
+
+    # Verificar se mais de uma opção entre 2, 3, 4, 5, 6 foi selecionada
+    regioes_selecionadas = [opcao2_norte, opcao2_sul, opcao2_oeste, opcao2_centro, opcao2_niteroi, opcao2_baixada]
+    if regioes_selecionadas.count("") < len(regioes_selecionadas) - 1:
+        caixa_resultado.delete('1.0', tk.END)  # Limpar o conteúdo anterior
+        caixa_resultado.insert(tk.END, "**********************ATENÇÃO********************** \n\n VOCÊ NÃO PODE ESTAR EM DOIS LUGARES AO MESMO TEMPO.\n\n***************************************************")
+        return
+
+    # Verificar se as opções de Clientes PL e Clientes BD foram selecionadas ao mesmo tempo
+    if opcao5 and opcao_bd:
+        caixa_resultado.delete('1.0', tk.END)
+        caixa_resultado.insert(tk.END, "**********************ATENÇÃO********************** \n\n VOCÊ NÃO PODE SELECIONAR DOIS CLIENTES AO MESMO TEMPO.\n\n***************************************************")
+        return
+
+    # Destacar as opções selecionadas com cores
+    for combo_box, opcao in zip([menu_opcao1, menu_opcao2_norte, menu_opcao2_sul, menu_opcao2_oeste, menu_opcao2_centro, menu_opcao2_niteroi,
+                                menu_opcao2_baixada,  # Adicione esta variável
+                                menu_opcao3, menu_opcao4, menu_opcao5, menu_opcao_bd],
+                               [opcao1, opcao2_norte, opcao2_sul, opcao2_oeste, opcao2_centro, opcao2_niteroi, opcao2_baixada,  # Adicione esta variável
+                                opcao3, opcao4, opcao5, opcao_bd]):
+        if opcao:
+            combo_box.configure(foreground="blue")
+
+    # Criar lista com cinco colunas na ordem desejada
+    lista_opcoes = [[opcao1],  # Volume
+                    [opcao2_norte, opcao2_sul, opcao2_oeste, opcao2_centro, opcao2_niteroi, opcao2_baixada],  # Região
+                    [opcao5],  # Clientes PL
+                    [opcao_bd],  # Clientes BD
+                    [opcao4],  # Nota/Prot
+                    [opcao3]]  # Emp/Origem
+
+    # Converter a lista em uma string formatada  -------------------- removi os espaços entre as aspas
+    resultado = ''.join([''.join(opcoes) for opcoes in lista_opcoes if any(opcoes)])
+
+    caixa_resultado.delete('1.0', tk.END)  # Limpar o conteúdo anterior
+    caixa_resultado.insert(tk.END, resultado)
+
+
+def copiar_resultado():
+    resultado = caixa_resultado.get("1.0", "end-1c")
+    pyperclip.copy(resultado)
+
+
+# Função para zerar as opções
+def zerar_opcoes():
+    carregar_valores_padrao()
+    caixa_resultado.delete('1.0', tk.END)
+
+
+# Criação da janela principal
+janela = tk.Tk()
+janela.title("Informações Adicionais - By Mr.Ludolff")
+janela.geometry("1024x768")
+
+# Criação dos widgets
+rotulo_opcoes = tk.Label(janela, text="\n\n\n\n\n\n")
+rotulo_opcoes.grid(row=0, column=0, columnspan=2)
+
+# ComboBox VOLUME
+var_opcao1 = tk.StringVar(value="VOLUME")
+menu_opcao1 = ttk.Combobox(janela, values=list(volumes.keys()), textvariable=var_opcao1)
+menu_opcao1.grid(row=2, column=0, padx=(125,0)) #125 pixels antes da caixa
+
+# ComboBox Região NORTE
+var_opcao2_norte = tk.StringVar(value="NORTE")
+menu_opcao2_norte = ttk.Combobox(janela, values=list(zona_norte.keys()), textvariable=var_opcao2_norte)
+menu_opcao2_norte.grid(row=2, column=1)
+
+# ComboBox Região SUL
+var_opcao2_sul = tk.StringVar(value="SUL")
+menu_opcao2_sul = ttk.Combobox(janela, values=list(zona_sul.keys()), textvariable=var_opcao2_sul)
+menu_opcao2_sul.grid(row=3, column=1)
+
+# ComboBox Região OESTE
+var_opcao2_oeste = tk.StringVar(value="OESTE")
+menu_opcao2_oeste = ttk.Combobox(janela, values=list(zona_oeste.keys()), textvariable=var_opcao2_oeste)
+menu_opcao2_oeste.grid(row=4, column=1)
+
+# ComboBox Região CENTRO
+var_opcao2_centro = tk.StringVar(value="CENTRO")
+menu_opcao2_centro = ttk.Combobox(janela, values=list(centro.keys()), textvariable=var_opcao2_centro)
+menu_opcao2_centro.grid(row=5, column=1)
+
+# ComboBox Região NITERÓI
+var_opcao2_niteroi = tk.StringVar(value="NITERÓI")
+menu_opcao2_niteroi = ttk.Combobox(janela, values=list(niteroi.keys()), textvariable=var_opcao2_niteroi)
+menu_opcao2_niteroi.grid(row=6, column=1)
+
+# ComboBox BAIXADA
+var_opcao2_baixada = tk.StringVar(value="BAIXADA")
+menu_opcao2_baixada = ttk.Combobox(janela, values=list(baixada.keys()), textvariable=var_opcao2_baixada)
+menu_opcao2_baixada.grid(row=7, column=1)
+
+
+# ComboBox PL
+var_opcao5 = tk.StringVar(value="CLIENTES PL")
+menu_opcao5 = ttk.Combobox(janela, values=list(clientes_platinum.keys()), textvariable=var_opcao5)
+menu_opcao5.grid(row=2, column=2)
+
+# ComboBox BD
+var_opcao_bd = tk.StringVar(value="CLIENTES BD")
+menu_opcao_bd = ttk.Combobox(janela, values=list(clientes_beleza_divina.keys()), textvariable=var_opcao_bd)
+menu_opcao_bd.grid(row=3, column=2)
+
+# ComboBox NOTA/PROT
+var_opcao4 = tk.StringVar(value="NOTA/PROT")
+menu_opcao4 = ttk.Combobox(janela, values=list(nota_protocolo.keys()), textvariable=var_opcao4)
+menu_opcao4.grid(row=2, column=3)
+
+#ComboBox EMP/ORIGEM
+var_opcao3 = tk.StringVar(value="EMPRESA/ORIGEM")
+menu_opcao3 = ttk.Combobox(janela, values=list(empresa_origem.keys()), textvariable=var_opcao3)
+menu_opcao3.grid(row=3, column=3)
+
+
+# Botão "Bom dia"
+botao_bom_dia = tk.Button(janela, text="Bom dia!!", command=mensagem_bom_dia)
+botao_bom_dia.grid(row=8, column=3, pady=(10, 0), padx=(10, 0))  # Posicionado ao lado das ComboBoxes
+
+#Botão para obter resultado
+botao_obter_resultado = tk.Button(janela, text="Obter Resultado", command=obter_resultado)
+botao_obter_resultado.grid(row=8, column=0, pady=(10, 0))
+
+#Botão para copiar resultado para a área de transferência
+botao_copiar_resultado = tk.Button(janela, text="Copiar Resultado", command=copiar_resultado)
+botao_copiar_resultado.grid(row=8, column=1, pady=(10, 0))
+
+#Botão para zerar opções
+botao_zerar_opcoes = tk.Button(janela, text="Zerar Opções", command=zerar_opcoes)
+botao_zerar_opcoes.grid(row=8, column=2, pady=(10, 0))
+
+
+
+#Caixa de texto para exibir o resultado
+caixa_resultado = tk.Text(janela, height=10, width=80, wrap=tk.WORD)
+caixa_resultado.grid(row=9, column=0, columnspan=5, pady=(10, 0))
+
+#Carregar os valores padrão nas ComboBoxes
+carregar_valores_padrao()
+
+
+#Iniciar o loop principal da interface gráfica
+janela.mainloop()
+
+
+
+
+
+
