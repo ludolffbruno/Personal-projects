@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+build/
+dist/
+
+# Sensível (NÃO ENVIAR)
+token.json
+*.spec
+
+# Notas (Opcional, geralmente não se envia a pasta de saída)
+Notas-Salvas-xml-email/
