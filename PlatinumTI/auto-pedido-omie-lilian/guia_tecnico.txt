@@ -1,0 +1,39 @@
+
+📄 guia_tecnico.txt – Instruções para Atualização e Compilação da Aplicação
+
+✅ Pré-requisitos
+- Python 3.13 instalado corretamente no sistema
+- Nuitka instalado:
+  pip install nuitka
+- Todos os arquivos do projeto devem estar na mesma pasta:
+  - gui.py
+  - main_automation_script.py
+  - extract_pdf_data.py
+  - populate_excel.py
+  - Outros arquivos utilizados (ex: Excel de mapeamento, planilhas, templates)
+
+
+🔄 Passo a passo para atualizar o programa
+
+1. Edite o código necessário
+   - Realize as modificações em qualquer dos arquivos .py do projeto.
+
+2. (Opcional) Teste antes de compilar
+   - Execute normalmente com:
+     python gui.py
+
+3. Compile novamente com o Nuitka
+   - Use o seguinte comando atualizado para criar um único executável, com a interface Tkinter e sem abrir o terminal:
+     nuitka gui.py --onefile --enable-plugin=tk-inter --windows-console-mode=disable
+
+4. O executável será gerado nesta pasta:
+   - .\gui.exe
+
+
+🧾 Logs
+- Todos os logs da aplicação são salvos no arquivo log.txt, que será criado automaticamente na mesma pasta do .exe.
+
+
+⚠️ Atenção
+- Não utilize mais o plugin --enable-plugin=numpy, ele está obsoleto e será removido em versões futuras.
+- O argumento --windows-disable-console também está obsoleto — prefira --windows-console-mode=disable.
