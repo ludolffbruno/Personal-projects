@@ -1,0 +1,33 @@
+# === Core ===
+flask>=3.0.0
+python-dotenv>=1.0.0
+
+# === Microsoft Graph / Auth ===
+msal>=1.28.0
+requests>=2.31.0
+
+# === AI Engine ===
+google-genai>=1.0.0
+google-generativeai>=0.7.0
+groq>=0.9.0
+openai>=1.52.0
+langgraph>=0.2.0
+langchain-core>=0.2.0
+langchain-google-genai>=1.0.0
+
+# === Vector Memory ===
+chromadb>=0.5.0
+
+# === Attachment Parsing ===
+pypdf>=4.0.0
+python-docx>=1.1.0
+Pillow>=10.0.0
+
+# === Utilities ===
+python-dateutil>=2.8.0
+
+# === Template Rendering ===
+pystache>=0.6.5
+
+# === Production Server ===
+waitress>=3.0.0

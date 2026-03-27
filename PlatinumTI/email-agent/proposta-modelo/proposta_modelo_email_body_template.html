@@ -1,0 +1,45 @@
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #111; line-height: 1.35;">
+  <p style="margin:0;"><strong>Ao</strong><br>
+  {{cliente_empresa}}<br>
+  <strong>At.</strong> {{cliente_contato_nome}}</p>
+
+  <p style="margin:16px 0 16px 0;">Segue abaixo proposta:</p>
+
+  <p style="margin:0 0 6px 0; background-color: #d3d3d3; padding: 2px;"><strong>DADOS DA EMPRESA</strong></p>
+  <p style="margin:0;"><strong>Nome da Empresa:</strong> {{empresa_nome}}</p>
+  <p style="margin:0;"><strong>CNPJ:</strong> {{empresa_cnpj}}</p>
+  <p style="margin:0;"><strong>Inscr. Estadual:</strong> {{empresa_ie}}</p>
+  <p style="margin:0;"><strong>Pessoa de Contato:</strong> {{empresa_contato}}</p>
+  <p style="margin:0;"><strong>E-mail:</strong> {{empresa_email}}</p>
+  <p style="margin:0 0 16px 0;"><strong>Dados banc&aacute;rios:</strong> {{empresa_dados_bancarios}}</p>
+
+  <p style="margin:0 0 16px 0; background-color: #d3d3d3; padding: 2px;"><strong>RFQ:</strong> {{processo_descricao}}</p>
+
+  {{#itens}}
+  <div style="margin:0 0 16px 0;">
+    <p style="margin:0 0 4px 0;"><strong>Item {{item_indice}} &ndash; {{item_descricao}}</strong></p>
+    {{#item_detalhes}}
+    <p style="margin:0;">{{item_detalhes}}</p>
+    {{/item_detalhes}}
+    <p style="margin:0;">Quantidade: {{item_quantidade}}</p>
+    <p style="margin:0;">Pre&ccedil;o unit&aacute;rio: {{item_valor_unitario_bruto}}</p>
+    <p style="margin:0;">Pre&ccedil;o total: {{item_valor_total_bruto}}</p>
+    {{#item_observacao}}
+    <p style="margin:8px 0 0 0;">{{item_observacao}}</p>
+    {{/item_observacao}}
+  </div>
+  {{/itens}}
+
+  <p style="margin:0 0 16px 0;">Valor Global da Proposta &ndash; {{valor_global}}</p>
+
+  <p style="margin:16px 0 10px 0;"><strong>Condi&ccedil;&otilde;es de fornecimento:</strong></p>
+  <p style="margin:0;">Entrega: {{condicao_entrega}}</p>
+  <p style="margin:0 0 16px 0;">Pagamento: {{condicao_pagamento}}</p>
+
+  <p style="margin:0 0 16px 0;">Validade: {{validade_proposta}}</p>
+
+  <p style="margin:0 0 16px 0; background-color: #fff200; display: inline-block; padding: 2px;"><strong>Faturamento {{empresa_nome_curto}} {{empresa_cnpj}}</strong></p>
+
+  <p style="margin:16px 0 0 0; font-size: 12px;">Agradecemos a oportunidade e estaremos &agrave; disposi&ccedil;&atilde;o para dirimir quaisquer d&uacute;vidas que surjam.<br>
+  Local e Data: Rio de Janeiro, {{data_atual}}.</p>
+</div>

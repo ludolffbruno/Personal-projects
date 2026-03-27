@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="60">
+    <title>Vendedor Imortal — Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #060810;
+            --surface: #0b0f1a;
+            --card: #0f1623;
+            --card-hover: #141e30;
+            --border: #1a2235;
+            --border-strong: #2a3650;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --accent: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.15);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --muted: #4b5568;
+            --muted-light: #6b7280;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --platinum: linear-gradient(135deg, #f59e0b, #fbbf24, #f97316);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 72px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .sidebar-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--muted-light);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .sidebar-btn:hover {
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .sidebar-btn.active {
+            background: var(--primary-glow);
+            color: var(--primary-light);
+        }
+
+        .sidebar-spacer {
+            flex: 1;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main {
+            margin-left: 72px;
+            min-height: 100vh;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            height: 64px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            background: var(--surface);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-title {
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .topbar-badge {
+            background: var(--primary-glow);
+            border: 1px solid #6366f150;
+            color: var(--primary-light);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-logout {
+            font-size: 13px;
+            color: var(--muted-light);
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .btn-logout:hover {
+            color: var(--danger);
+        }
+
+        /* ── PAGE CONTENT ── */
+        .content {
+            padding: 32px;
+            max-width: 1400px;
+        }
+
+        /* ── STATS ROW ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 24px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-strong);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient);
+        }
+
+        .stat-card.indigo {
+            --gradient: linear-gradient(90deg, #6366f1, #8b5cf6);
+        }
+
+        .stat-card.amber {
+            --gradient: linear-gradient(90deg, #f59e0b, #f97316);
+        }
+
+        .stat-card.green {
+            --gradient: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .stat-card.purple {
+            --gradient: linear-gradient(90deg, #8b5cf6, #ec4899);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--muted-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 8px 0 4px;
+            color: var(--text);
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--muted-light);
+        }
+
+        .stat-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            opacity: 0.2;
+        }
+
+        /* ── ACTION BAR ── */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .action-bar-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .action-bar-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+        }
+
+        .btn-run:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-run:active {
+            transform: translateY(0);
+        }
+
+        .btn-run:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--card);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--border-strong);
+            color: var(--text);
+            background: var(--card-hover);
+        }
+
+        /* ── AGENT PROGRESS ── */
+        .agent-progress {
+            background: var(--card);
+            border: 1px solid #6366f1;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--primary-glow);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        .progress-text strong {
+            color: var(--text);
+        }
+
+        /* ── ERROR BOX ── */
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 14px;
+            color: #f87171;
+            margin-bottom: 24px;
+        }
+
+        /* ── EMAIL CARDS LIST ── */
+        .emails-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .email-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .email-card:hover {
+            border-color: var(--border-strong);
+            background: var(--card-hover);
+        }
+
+        .email-card.is-quote {
+            border-left: 3px solid var(--accent);
+        }
+
+        .email-card.not-quote {
+            border-left: 3px solid var(--border);
+        }
+
+        .email-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 24px;
+            cursor: pointer;
+        }
+
+        /* Platinum badge */
+        .platinum-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(249, 115, 22, 0.2));
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fbbf24;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .not-quote-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(75, 85, 99, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .email-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .email-subject {
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .email-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .email-sender {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .confidence-pill {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .conf-high {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .conf-mid {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .conf-low {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        .chevron {
+            color: var(--muted);
+            font-size: 14px;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .email-card.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Expanded details */
+        .email-details {
+            display: none;
+            border-top: 1px solid var(--border);
+            padding: 20px 24px;
+            margin-bottom: 16px;
+        }
+
+        .email-card.open .email-details {
+            display: block;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .detail-box-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted-light);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-box-content {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .items-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .item-tag {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .draft-preview {
+            background: var(--surface);
+            border: 1px solid #6366f140;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 80px 32px;
+            color: var(--muted-light);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: 14px;
+        }
+
+        /* ── MEMORY PANEL ── */
+        .memory-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-top: 32px;
+        }
+
+        .memory-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .memory-title {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .memory-stats-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .memory-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .memory-stat-label {
+            font-size: 11px;
+            color: var(--muted-light);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .memory-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        /* ── LAST RUN ── */
+        .last-run-badge {
+            font-size: 12px;
+            color: var(--muted-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .last-run-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-strong);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">🌬️</div>
+        <button class="sidebar-btn active" title="Dashboard">📊</button>
+        <button class="sidebar-btn" title="Memória de Estilo" onclick="syncMemory()">🧠</button>
+        <div class="sidebar-spacer"></div>
+        <a href="/auth/logout" class="sidebar-btn" title="Sair">🚪</a>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="main">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <span class="topbar-title">Vendedor Imortal</span>
+                <span class="topbar-badge">Multi-LLM (Gemini 2.5 + Groq)</span>
+            </div>
+            <div class="topbar-right">
+                {% if last_run %}
+                <div class="last-run-badge">
+                    <div class="last-run-dot"></div>
+                    Última: {{ last_run }}
+                </div>
+                {% endif %}
+                {% if next_run and scheduler_active %}
+                <div class="last-run-badge" style="color:#a5b4fc">
+                    ⏱ Próxima: {{ next_run }}
+                </div>
+                {% endif %}
+                <button onclick="toggleScheduler()" class="btn" title="Ativa a checagem a cada {{ poll_interval }} minutos no modo automático"
+                    style="padding:6px 14px;font-size:12px;{% if scheduler_active %}background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);{% else %}background:var(--card);color:var(--muted-light);border:1px solid var(--border);{% endif %}">
+                    {% if scheduler_active %}⏸ Verificação Automática [Ligada]{% else %}▶ Verificação Automática [Desligada]{% endif %}
+                </button>
+                <a href="/auth/logout" class="btn-logout">Sair →</a>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+            <!-- STATS -->
+            {% set total = results|length %}
+            {% set quotes = results|selectattr('is_quote')|list %}
+            {% set drafted = results|selectattr('draft_created')|list %}
+
+            <div class="stats-grid">
+                <div class="stat-card indigo">
+                    <div class="stat-icon">📬</div>
+                    <div class="stat-label">E-mails Analisados</div>
+                    <div class="stat-value">{{ total }}</div>
+                    <div class="stat-sub">Nesta execução</div>
+                </div>
+                <div class="stat-card amber">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-label">Cotações Detectadas</div>
+                    <div class="stat-value">{{ quotes|length }}</div>
+                    <div class="stat-sub">Marcados como Platinum</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-label">Rascunhos Criados</div>
+                    <div class="stat-value">{{ drafted|length }}</div>
+                    <div class="stat-sub">Prontos no Outlook</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-icon">👁</div>
+                    <div class="stat-label">J&aacute; Processados</div>
+                    <div class="stat-value">{{ seen_stats.total_seen }}</div>
+                    <div class="stat-sub">{{ seen_stats.drafts_created }} rascunhos criados</div>
+                </div>
+            </div>
+
+            <!-- ACTION BAR -->
+            <div class="action-bar">
+                <div>
+                    <div class="action-bar-title">Caixa de Entrada — Apenas E-mails Novos</div>
+                    <div style="font-size:12px;color:var(--muted-light);margin-top:4px">
+                        Intervalo: {{ poll_interval }} min &nbsp;·&nbsp;
+                        Mem&oacute;ria: {{ memory_stats.total_emails }} e-mails indexados
+                    </div>
+                </div>
+                <div class="action-bar-right">
+                    <button class="btn btn-secondary" onclick="syncMemory()" id="syncBtn">
+                        Sincronizar Mem&oacute;ria
+                    </button>
+                    <button class="btn btn-run" onclick="runAgent()" id="runBtn" title="Forçar uma nova checagem de e-mails imediatamente" {% if is_running %}disabled{% endif %}>
+                        {% if is_running %}
+                        Processando...
+                        {% else %}
+                        Forçar Verificação Agora
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+
+            <!-- PROGRESS BAR (while running) -->
+            {% if is_running %}
+            <div class="agent-progress" id="progressBar">
+                <div class="spinner"></div>
+                <div class="progress-text">
+                    <strong>Agente trabalhando...</strong><br>
+                    Lendo e-mails, classificando cotações e gerando rascunhos. Esta operação pode levar 1 a 2 minutos.
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ERROR -->
+            {% if error %}
+            <div class="alert-error">
+                ⚠️ <strong>Erro:</strong> {{ error }}
+            </div>
+            {% endif %}
+
+            <!-- EMAIL RESULTS LIST -->
+            {% if results %}
+            <div class="emails-list" id="emailsList">
+                {% for r in results %}
+                <div class="email-card {% if r.is_quote %}is-quote{% else %}not-quote{% endif %}"
+                    id="card-{{ loop.index }}">
+                    <div class="email-card-header" onclick="toggleCard('card-{{ loop.index }}')">
+                        <!-- Badge -->
+                        {% if r.is_quote %}
+                        <span class="platinum-badge">⭐ Platinum Sales</span>
+                        {% else %}
+                        <span class="not-quote-badge">⊘ Não é cotação</span>
+                        {% endif %}
+
+                        <!-- Email info -->
+                        <div class="email-info">
+                            <div class="email-subject">{{ r.subject or '(sem assunto)' }}</div>
+                            <div class="email-meta">
+                                <span class="email-sender">✉️ {{ r.sender }}</span>
+                                {% if r.confidence %}
+                                <span
+                                    class="confidence-pill {% if r.confidence >= 80 %}conf-high{% elif r.confidence >= 50 %}conf-mid{% else %}conf-low{% endif %}">
+                                    {{ r.confidence }}% confiança
+                                </span>
+                                {% endif %}
+                                <span>{{ r.received[:10] if r.received else '' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Indicators -->
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+                            {% if r.draft_created %}
+                            <span style="font-size:12px;color:#34d399;font-weight:600">Rascunho criado</span>
+                            {% endif %}
+                            {% if r.has_client_history %}
+                            <span style="font-size:11px;color:#a5b4fc;font-weight:500">Cliente conhecido</span>
+                            {% endif %}
+                            {% if r.template_applied %}
+                            <span style="font-size:11px;color:#34d399;font-weight:600">Template padrao</span>
+                            {% else %}
+                            <span style="font-size:11px;color:#fbbf24;font-weight:600">Modo fallback</span>
+                            {% endif %}
+                        </div>
+
+                        <span class="chevron">▼</span>
+                    </div>
+
+                    <!-- Expanded details -->
+                    <div class="email-details">
+                        <div class="details-grid">
+                            <!-- Raciocínio da IA -->
+                            <div class="detail-box">
+                                <div class="detail-box-title">🤖 Raciocínio da IA</div>
+                                <div class="detail-box-content">{{ r.reason or 'Sem raciocínio disponível.' }}</div>
+                            </div>
+
+                            <!-- Itens detectados -->
+                            <div class="detail-box">
+                                <div class="detail-box-title">📦 Itens Detectados</div>
+                                <div class="detail-box-content">
+                                    {% if r.detected_items %}
+                                    <div class="items-list">
+                                        {% for item in r.detected_items %}
+                                        <span class="item-tag">{{ item }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    <span>Nenhum item identificado.</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Draft preview -->
+                        
+                        {% set sf = r.structured_fields or {} %}
+                        <div class="detail-box" style="margin-top:12px;">
+                            <div class="detail-box-title">🧩 Campos Estruturados</div>
+                            <div class="detail-box-content">
+                                <div><strong>Cliente:</strong> {{ sf.get('cliente_empresa', '-') }}</div>
+                                <div><strong>Contato:</strong> {{ sf.get('cliente_contato_nome', '-') }}</div>
+                                <div><strong>Processo:</strong> {{ sf.get('processo_descricao', '-') }}</div>
+                                <div><strong>Itens:</strong> {{ sf.get('itens_count', 0) }}</div>
+                                {% if sf.get('missing_fields') %}
+                                <div style="margin-top:6px;"><strong>Campos faltantes:</strong> {{ sf.get('missing_fields')|join(', ') }}</div>
+                                {% endif %}
+                                {% if sf.get('error') %}
+                                <div style="margin-top:6px;color:#f87171;"><strong>Observacao:</strong> {{ sf.get('error') }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if r.draft_preview %}
+                        <div class="detail-box">
+                            <div class="detail-box-title">📧 Prévia do Rascunho (assunto: {{ r.draft_subject }})</div>
+                            <div class="draft-preview">{{ r.draft_preview }}</div>
+                        </div>
+                        {% endif %}
+
+                        {% if r.error %}
+                        <div
+                            style="margin-top:12px;padding:10px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;font-size:13px;color:#f87171;">
+                            ⚠️ Erro: {{ r.error }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🌬️</div>
+                <div class="empty-title">Nenhuma análise ainda</div>
+                <div class="empty-desc">Clique em "Analisar E-mails" para o agente começar a trabalhar.</div>
+            </div>
+            {% endif %}
+
+            <!-- MEMORY PANEL -->
+            <div class="memory-panel">
+                <div class="memory-header">
+                    <div class="memory-title">Mem&oacute;ria de Estilo do Vendedor</div>
+                    <button class="btn btn-secondary" onclick="syncMemory()" style="padding:8px 14px;font-size:13px;">
+                        Sincronizar Agora
+                    </button>
+                </div>
+                <div class="memory-stats-row">
+                    <div class="memory-stat">
+                        <div class="memory-stat-label">E-mails Enviados Indexados</div>
+                        <div class="memory-stat-value">{{ memory_stats.total_emails }}</div>
+                    </div>
+                    <div class="memory-stat">
+                        <div class="memory-stat-label">E-mails Analisados Total</div>
+                        <div class="memory-stat-value" style="font-size:20px;color:#6366f1;">{{ seen_stats.total_seen
+                            }}</div>
+                    </div>
+                    <div class="memory-stat">
+                        <div class="memory-stat-label">Cotac&otilde;es Detectadas</div>
+                        <div class="memory-stat-value" style="font-size:20px;color:#f59e0b;">{{ seen_stats.quotes }}
+                        </div>
+                    </div>
+                    <div class="memory-stat">
+                        <div class="memory-stat-label">Rascunhos Criados</div>
+                        <div class="memory-stat-value" style="font-size:20px;color:#10b981;">{{
+                            seen_stats.drafts_created }}</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+
+    <script>
+        // ── Toggle email card ──
+        function toggleCard(id) {
+            const card = document.getElementById(id);
+            card.classList.toggle('open');
+        }
+
+        // ── Run Agent ──
+        async function runAgent() {
+            const btn = document.getElementById('runBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Iniciando...';
+
+            try {
+                const resp = await fetch('/api/run-agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ count: 2 })
+                });
+                const data = await resp.json();
+                if (data.error) {
+                    alert('Erro: ' + data.error);
+                    btn.disabled = false;
+                    btn.innerHTML = '▶ Analisar E-mails';
+                    return;
+                }
+                // Poll until done
+                pollStatus();
+            } catch (e) {
+                alert('Erro de rede: ' + e);
+                btn.disabled = false;
+                btn.innerHTML = '▶ Analisar E-mails';
+            }
+        }
+
+        // ── Poll Status ──
+        async function pollStatus() {
+            const interval = setInterval(async () => {
+                try {
+                    const resp = await fetch('/api/status');
+                    const data = await resp.json();
+                    if (!data.is_running) {
+                        clearInterval(interval);
+                        window.location.reload();
+                    }
+                } catch (e) {
+                    clearInterval(interval);
+                }
+            }, 3000);
+        }
+
+        // ── Sync Memory ──
+        async function syncMemory() {
+            const btn = document.getElementById('syncBtn');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.textContent = 'Sincronizando...';
+            try {
+                const resp = await fetch('/api/sync-memory', { method: 'POST' });
+                const data = await resp.json();
+                if (data.error) {
+                    alert('Erro: ' + data.error);
+                } else {
+                    alert('Sincronizacao concluida!\n' + data.new_added + ' novos e-mails adicionados.\nTotal: ' + data.total_in_memory);
+                    window.location.reload();
+                }
+            } catch (e) {
+                alert('Erro: ' + e);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = orig;
+            }
+        }
+
+        // ── Toggle Scheduler ──
+        async function toggleScheduler() {
+            try {
+                const resp = await fetch('/api/scheduler/toggle', { method: 'POST' });
+                const data = await resp.json();
+                window.location.reload();
+            } catch (e) {
+                alert('Erro: ' + e);
+            }
+        }
+
+        // ── Auto-poll if running ──
+        {% if is_running %}
+        pollStatus();
+        {% endif %}
+    </script>
+</body>
+
+</html>

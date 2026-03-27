@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual env
+venv/
+.venv/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+.token_cache.json
+
+# Local databases / runtime state
+seen_emails.db
+chroma_data/
+
+# Logs and temp
+*.log
+*.tmp
+*.bak
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Test/cache
+.pytest_cache/
+.mypy_cache/
