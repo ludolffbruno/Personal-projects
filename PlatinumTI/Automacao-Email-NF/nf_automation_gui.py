@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+Projeto: Platinum NF Automation
+Desenvolvido por: Mr Ludolff (Bruno Ludolff)
+Descrição: Interface Gráfica para monitoramento e processamento de NF-e via Microsoft Graph API.
+Licença: Este software é de propriedade intelectual de Bruno Ludolff. 
+Uso restrito e autorizado apenas para fins específicos de automação interna.
+Todos os direitos reservados © 2026.
+"""
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
 import threading
@@ -11,8 +19,8 @@ import graph_email_monitor as monitor
 class NFAutomationGUI(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Automação E-mail Alex By: Mr Ludolff")
-        self.geometry("800x600")
+        self.title("Platinum NF Automation - By Mr.Ludolff")
+        self.geometry("1100x800")
         self.configure(bg="#f0f2f5")
         
         self.monitor_thread = None
@@ -26,7 +34,7 @@ class NFAutomationGUI(tk.Tk):
         # Header
         header = tk.Frame(self, bg="#1a73e8", height=60)
         header.pack(fill="x")
-        tk.Label(header, text="Automação Email Alex", fg="white", bg="#1a73e8", font=("Segoe UI", 16, "bold")).pack(pady=15)
+        tk.Label(header, text="Platinum NF Automation", fg="white", bg="#1a73e8", font=("Segoe UI", 16, "bold")).pack(pady=15)
 
         # Control Panel
         ctrl_frame = tk.LabelFrame(self, text=" Painel de Controle ", font=("Segoe UI", 10, "bold"), padx=10, pady=10)
@@ -67,15 +75,19 @@ class NFAutomationGUI(tk.Tk):
         status_bar.pack(fill="x", side="bottom")
 
     def update_log(self, message):
-        self.log_area.insert(tk.END, f"[{datetime.now().strftime('%H:%M:%S')}] {message}\n")
-        self.log_area.see(tk.END)
+        def _update():
+            self.log_area.insert(tk.END, f"[{datetime.now().strftime('%H:%M:%S')}] {message}\n")
+            self.log_area.see(tk.END)
+        self.after(0, _update)
 
     def update_timer_gui(self, seconds):
-        if seconds > 0:
-            mins, secs = divmod(seconds, 60)
-            self.timer_var.set(f"Próxima sincronização em: {mins:02d}:{secs:02d}")
-        else:
-            self.timer_var.set("")
+        def _update():
+            if seconds > 0:
+                mins, secs = divmod(seconds, 60)
+                self.timer_var.set(f"Próxima sincronização em: {mins:02d}:{secs:02d}")
+            else:
+                self.timer_var.set("")
+        self.after(0, _update)
 
     def toggle_sync(self):
         if self.monitor_thread and self.monitor_thread.is_alive():
@@ -110,8 +122,10 @@ class NFAutomationGUI(tk.Tk):
         self.auth_frame.pack(padx=20, pady=5)
         auth_url = monitor.get_authorization_url(monitor.TENANT_ID, monitor.CLIENT_ID, monitor.SCOPES)
         webbrowser.open(auth_url)
-        self.update_log("⚠️ Autenticação necessária. O navegador foi aberto.")
-        self.update_log("👉 Faça login e cole a URL final no campo acima.")
+        self.update_log("⚠️ Autenticação necessária.")
+        self.update_log(f"🔗 LINK PARA COPIAR: {auth_url}")
+        self.update_log("💡 DICA: Copie o link acima e cole em uma aba ANÔNIMA para logar na conta correta.")
+        self.update_log("👉 Após o login, a página dará erro. Cole a URL final no campo acima.")
 
     def submit_auth(self):
         url = self.url_entry.get().strip()

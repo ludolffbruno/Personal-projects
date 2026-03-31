@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+Projeto: Platinum NF Automation
+Desenvolvido por: Mr Ludolff (Bruno Ludolff)
+Descrição: Monitoramento e processamento de NF-e via Microsoft Graph API.
+Licença: Este software é de propriedade intelectual de Bruno Ludolff. 
+Uso restrito e autorizado apenas para fins específicos de automação interna.
+Todos os direitos reservados © 2026.
+"""
 import os
 import json
 import base64
@@ -11,21 +19,24 @@ import fitz  # PyMuPDF
 from datetime import datetime, timedelta
 from requests.exceptions import RequestException
 from urllib.parse import urlparse, parse_qs
+from dotenv import load_dotenv
 
+# Carrega variáveis do arquivo .env
+load_dotenv()
 
-# Configurações de autenticação (estas precisarão ser obtidas do Azure AD)
-TENANT_ID = "COLOQUE_SEU_TENANT_ID"
-CLIENT_ID = "COLOQUE_SEU_CLIENT_ID"
-CLIENT_SECRET = "COLOQUE_SEU_CLIENT_SECRET"
+# Configurações de autenticação (obtidas do arquivo .env)
+TENANT_ID = os.getenv("TENANT_ID")  # ID do Tenant Azure AD
+CLIENT_ID = os.getenv("CLIENT_ID")  # ID do Aplicativo Registrado no Azure AD
+CLIENT_SECRET = os.getenv("CLIENT_SECRET") # Segredo do Cliente do Aplicativo Registrado
 
-# ID da pasta #NFE PLATINUM
-NFE_PLATINUM_FOLDER_ID = "COLOQUE_SEU_FOLDER_ID"
+# ID da pasta #NFE PLATINUM (obtido do Graph Explorer)
+NFE_PLATINUM_FOLDER_ID = "AAMkAGU5NjJkNGFiLWI5MjItNDU2NS1hZjA0LWY3NDZiNGI4YjYyOAAuAAAAAAC_L7sBebFGTqj2golQ1YDeAQB0ejjyOe8HQLqgrMerz56wAAK16f7eAAA="
 
 
 # Configurações Globais
 SENDER_EMAIL = "noreply@omie.com.br"
 SUBJECT_CONTAINS = "PLATINUM TELEINFORMATICA LTDA - Nota Fiscal Eletrônica - "
-BODY_CONTAINS = ["CLARO ", "TELMEX "]
+BODY_CONTAINS = ["CLARO S.A.", "CLARO NXT", "TELMEX DO BRASIL", "CLARO SA"]
 SCOPES = ["https://graph.microsoft.com/Mail.Read", "https://graph.microsoft.com/Mail.ReadWrite", "offline_access"]
 
 # Caminhos Relativos (dentro da pasta do projeto)
@@ -125,37 +136,121 @@ def refresh_access_token(tenant_id, client_id, client_secret, refresh_token):
         return None, None, None
 
 
-def get_nfe_emails(access_token, folder_id, sender, subject_contains, body_contains_list):
+def find_folder_id_by_name(access_token, folder_name):
     headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
-    
-    # Criar filtro para múltiplos BODY_CONTAINS
-    body_filters = " or ".join([f"contains(body/content, '{body}')" for body in body_contains_list])
-    filter_query = (
-        f"from/emailAddress/address eq '{sender}' and "
-        f"isRead eq false and "
-        f"contains(subject, '{subject_contains}') and "
-        f"({body_filters})"
-    )
-    encoded_filter = requests.utils.quote(filter_query)
-    url = f"https://graph.microsoft.com/v1.0/me/mailFolders('{folder_id}')/messages?$filter={encoded_filter}&$expand=attachments"
-    
+    url = "https://graph.microsoft.com/v1.0/me/mailFolders?$top=100"
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        return response.json()["value"]
+        folders = response.json().get("value", [])
+        for folder in folders:
+            if folder["displayName"].strip() == folder_name.strip():
+                return folder["id"]
+        return None
+    except Exception as e:
+        log(f"❌ Erro ao localizar pasta '{folder_name}': {e}")
+        return None
+
+def get_nfe_emails(access_token, folder_id, sender, subject_contains, body_contains_list):
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+    
+    # Validação dinâmica da pasta se houver erro ou se necessário
+    # (Opcional: podemos buscar pela ID fornecida e se falhar tentar pelo nome)
+    target_folder_id = folder_id
+    
+    # Vamos buscar os e-mails não lidos do remetente com o assunto base
+    filter_query = (
+        f"from/emailAddress/address eq '{sender}' and "
+        f"isRead eq false and "
+        f"contains(subject, '{subject_contains}')"
+    )
+    encoded_filter = requests.utils.quote(filter_query)
+    url = f"https://graph.microsoft.com/v1.0/me/mailFolders('{target_folder_id}')/messages?$filter={encoded_filter}&$select=subject,body,id,receivedDateTime&$expand=attachments&$top=50"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        
+        # Se der 404, a ID da pasta mudou. Vamos tentar achar pelo nome.
+        if response.status_code == 404:
+            log("ℹ️ ID da pasta desatualizado. Tentando localizar por nome...")
+            new_id = find_folder_id_by_name(access_token, "#NFE PLATINUM")
+            if new_id:
+                log(f"✅ Pasta localizada! Nova ID obtida.")
+                url = f"https://graph.microsoft.com/v1.0/me/mailFolders('{new_id}')/messages?$filter={encoded_filter}&$select=subject,body,id,receivedDateTime&$expand=attachments&$top=50"
+                response = requests.get(url, headers=headers)
+            else:
+                log("❌ Não foi possível encontrar a pasta '#NFE PLATINUM' pelo nome.")
+                return []
+
+        response.raise_for_status()
+        all_emails = response.json().get("value", [])
+        
+        if not all_emails:
+            # Check de diagnóstico: ver se existem e-mails que já estão LIDOS
+            try:
+                diag_filter = f"from/emailAddress/address eq '{sender}' and contains(subject, '{subject_contains}')"
+                diag_url = f"https://graph.microsoft.com/v1.0/me/mailFolders('{folder_id}')/messages?$filter={requests.utils.quote(diag_filter)}&$top=5"
+                diag_res = requests.get(diag_url, headers=headers).json().get("value", [])
+                if diag_res:
+                    log(f"ℹ️ Diagnóstico: Encontrei {len(diag_res)}+ e-mails, mas parecem estar todos como LIDOS.")
+            except:
+                pass
+            return []
+
+        filtered_emails = []
+        for email in all_emails:
+            body_content = email.get("body", {}).get("content", "")
+            subject = email.get("subject", "")
+            
+            # Verificar se contém alguma das palavras-chave ou se o assunto já é muito específico
+            match = any(body.upper() in body_content.upper() for body in body_contains_list)
+            
+            # Fallback: Se o assunto sugerir que é uma nota, prossegue para validar no PDF depois
+            if not match and "PLATINUM" in subject.upper() and "NOTA FISCAL" in subject.upper():
+                match = True
+                log(f"ℹ️ Aguardando validação do PDF (Corpo sem palavras-chave): {subject[:50]}...")
+
+            if match:
+                log(f"✅ E-mail compatível encontrado: {subject[:50]}...")
+                filtered_emails.append(email)
+            else:
+                # Log de debug para ajudar a entender o porquê de não estar pegando
+                log(f"ℹ️ E-mail ignorado: {subject[:50]}...")
+        
+        return filtered_emails
+
     except RequestException as e:
-        print(f"Erro ao buscar e-mails: {e}")
+        log(f"❌ Erro ao buscar e-mails: {e}")
         return []
 
 def extract_nf_data(pdf_content):
+    # Verificação de Cliente (Claro/NXT) no PDF
+    # Se não encontrar as palavras-chave no PDF, ignora o processamento
+    if "CLARO" not in pdf_content.upper() and "NXT" not in pdf_content.upper() and "TELMEX" not in pdf_content.upper():
+        log("⚠️ Ignorando: Nota Fiscal pertence a outro cliente (não é Claro/NXT).")
+        return None, None, None
+
     # Extrair número NF, pedido e protocolo do PDF
-    nf_match = re.search(r"Nº\s*(\d+(?:\.\d+)*)\s*Série", pdf_content, re.IGNORECASE)
+    # Log para debug (opcional, mostra os primeiros 500 chars se falhar)
+    
+    # Busca Número NF: Tenta padrão "Nº 123.456 Série" ou apenas "Nº 123456"
+    nf_match = re.search(r"N[oº]\.?\s*(\d+(?:\.\d+)*)", pdf_content, re.IGNORECASE)
     nf_number = nf_match.group(1).replace(".", "") if nf_match else None
     
-    pedido_protocolo_match = re.search(r"PEDIDO\s*(\d+)\s*/\s*PROTOCOLO\s*(\d+)", pdf_content, re.IGNORECASE)
-    pedido = pedido_protocolo_match.group(1) if pedido_protocolo_match else None
-    protocolo = pedido_protocolo_match.group(2) if pedido_protocolo_match else None
+    # Busca Pedido e Protocolo: Tenta versões com e sem barra, com e sem espaços
+    # Padrão flexível: PEDIDO [números] ... PROTOCOLO [números]
+    pedido_match = re.search(r"PEDIDO\s*:?\s*(\d+)", pdf_content, re.IGNORECASE)
+    protocolo_match = re.search(r"PROTOCOLO\s*:?\s*(\d+)", pdf_content, re.IGNORECASE)
     
+    pedido = pedido_match.group(1) if pedido_match else None
+    protocolo = protocolo_match.group(1) if protocolo_match else None
+    
+    # Log de diagnóstico removido (limpeza final)
+    # log(f"📊 Extração: NF={nf_number}, Pedido={pedido}, Protocolo={protocolo}")
+    
+    if not (nf_number and pedido and protocolo):
+        log(f"⚠️ Dados incompletos no PDF da NF {nf_number if nf_number else 'desconhecida'}. Ignorando.")
+        
     return nf_number, pedido, protocolo
 
 def create_or_rename_folder(nf_number, pedido, protocolo, is_cancelled=False):
@@ -185,7 +280,7 @@ def extract_text_fallback_with_pymupdf(file_path):
                 text += page.get_text()
         return text
     except Exception as e:
-        print(f"Erro ao extrair texto com PyMuPDF: {e}")
+        log(f"❌ Erro ao extrair texto com PyMuPDF: {e}")
         return None
 
 def download_attachments(attachments, save_dir):
@@ -200,23 +295,32 @@ def download_attachments(attachments, save_dir):
 
             with open(file_path, "wb") as f:
                 f.write(file_content_bytes)
-            print(f"Anexo salvo: {file_name}")
+            log(f"📎 Anexo salvo: {file_name}")
 
             if file_name.lower().endswith(".pdf"):
                 try:
+                    # Tenta localizar o pdftotext no projeto se não estiver no PATH
+                    pdftotext_cmd = "pdftotext"
+                    local_xpdf = os.path.join(SCRIPT_DIR, "xpdf-tools-win-4.06", "bin64", "pdftotext.exe")
+                    if not subprocess.run(["where.exe", "pdftotext"], capture_output=True).returncode == 0:
+                        if os.path.exists(local_xpdf):
+                            pdftotext_cmd = local_xpdf
+                            log(f"ℹ️ Usando pdftotext local: {pdftotext_cmd}")
+                    
                     result = subprocess.run(
-                        ["pdftotext", file_path, "-"],
+                        [pdftotext_cmd, file_path, "-"],
                         capture_output=True,
                         text=True,
                         encoding="utf-8"
                     )
-                    if result.returncode == 0:
+                    if result.returncode == 0 and result.stdout and len(result.stdout.strip()) > 0:
                         pdf_content = result.stdout
+                        log("✅ Texto extraído com sucesso.")
                     else:
-                        print("pdftotext não conseguiu extrair texto, tentando PyMuPDF...")
+                        log("⚠️ pdftotext retornou vazio ou falhou, tentando PyMuPDF...")
                         pdf_content = extract_text_fallback_with_pymupdf(file_path)
                 except Exception as e:
-                    print(f"Erro com pdftotext: {e}. Tentando PyMuPDF...")
+                    log(f"⚠️ Erro ao executar pdftotext: {e}. Tentando PyMuPDF...")
                     pdf_content = extract_text_fallback_with_pymupdf(file_path)
 
     return pdf_content
@@ -265,6 +369,61 @@ def append_text_to_draft(access_token, draft_id, text_line):
             }
             requests.patch(url, headers=headers, json=update_data)
             print(f"✓ Texto adicionado ao corpo do rascunho: {text_line}")
+
+def sort_draft_content(access_token, draft_id):
+    """
+    Ordena as linhas do rascunho pelo número da Nota Fiscal.
+    Mantém o cabeçalho original e ordena apenas as entradas de notas.
+    """
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+    url = f"https://graph.microsoft.com/v1.0/me/messages/{draft_id}"
+    
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return
+
+    content = response.json().get("body", {}).get("content", "")
+    if not content:
+        return
+
+    # Separar cabeçalho das linhas de notas
+    header_end_marker = "relação de notas carregadas no portal."
+    parts = content.split(header_end_marker)
+    
+    if len(parts) < 2:
+        return
+
+    header = parts[0] + header_end_marker + "\n\n"
+    # Filtrar apenas as linhas de Notas Fiscais para ignorar a lista de protocolos do final
+    lines = [l.strip() for l in parts[1].split("\n") if "Nota Fiscal Eletrônica" in l]
+    
+    if not lines:
+        return
+
+    # Função para extrair o número da NF para ordenação
+    def get_nf_number(line):
+        match = re.search(r"Nota Fiscal Eletrônica - (\d+)", line)
+        return int(match.group(1)) if match else 0
+
+    # Ordenar linhas
+    sorted_lines = sorted(lines, key=get_nf_number)
+    
+    # Gerar lista de protocolos para o final
+    protocols = []
+    for line in sorted_lines:
+        match_p = re.search(r"(\d+)$", line.strip()) # Pega o último grupo de números (protocolo)
+        if match_p:
+            protocols.append(match_p.group(1))
+            
+    protocol_section = "\n".join(protocols)
+    new_body = header + "\n".join(sorted_lines) + "\n\n\n" + protocol_section + "\n"
+
+    # Atualizar rascunho
+    update_data = {
+        "body": {"contentType": "Text", "content": new_body}
+    }
+    requests.patch(url, headers=headers, json=update_data)
+    print("✓ Rascunho ordenado por número de NF.")
 
 def attach_email_to_draft(access_token, draft_id, eml_path):
     headers = {
@@ -349,7 +508,7 @@ def process_emails(callback=None, timer_callback=None):
     
     access_token, refresh_token, expires_at = load_tokens()
 
-    if access_token and datetime.now() < expires_at:
+    if access_token and expires_at and datetime.now() < expires_at:
         log("✓ Token válido carregado.")
     else:
         log("⚠️ Token expirado ou inexistente.")
@@ -363,7 +522,7 @@ def process_emails(callback=None, timer_callback=None):
             
             # Verifica se está prestes a expirar
             _, _, expires_at = load_tokens()
-            if datetime.now() > expires_at - timedelta(minutes=5):
+            if expires_at and datetime.now() > expires_at - timedelta(minutes=5):
                 log("🔄 Renovando token...")
                 access_token, refresh_token, expires_in = refresh_access_token(TENANT_ID, CLIENT_ID, CLIENT_SECRET, refresh_token)
                 if access_token:
@@ -374,6 +533,7 @@ def process_emails(callback=None, timer_callback=None):
 
 
             emails = get_nfe_emails(access_token, NFE_PLATINUM_FOLDER_ID, SENDER_EMAIL, SUBJECT_CONTAINS, BODY_CONTAINS)
+            log(f"🔎 Foram encontrados {len(emails)} e-mails compatíveis para processar.")
             
             if emails:
                 # Busca ou cria o rascunho apenas se houver e-mails para processar
@@ -383,7 +543,7 @@ def process_emails(callback=None, timer_callback=None):
                     subject = email["subject"]
                     is_cancelled = "Cancelamento da Nota Fiscal Eletrônica" in subject
                     
-                    print(f"Processando: {subject[:50]}...")
+                    log(f"⏳ Processando: {subject[:50]}...")
                     
                     if email.get("attachments"):
                         # Criar pasta temporária para processar anexos
@@ -394,8 +554,10 @@ def process_emails(callback=None, timer_callback=None):
                         
                         if pdf_content:
                             nf_number, pedido, protocolo = extract_nf_data(pdf_content)
-                            
-                            if nf_number and pedido and protocolo:
+                        else:
+                            nf_number, pedido, protocolo = None, None, None
+                        
+                        if nf_number and pedido and protocolo:
                                 # Criar/renomear pasta
                                 folder_path = create_or_rename_folder(nf_number, pedido, protocolo, is_cancelled)
                                 
@@ -431,10 +593,14 @@ def process_emails(callback=None, timer_callback=None):
                         os.rmdir(temp_dir)
                     
                     mark_email_as_read(email["id"], access_token) #marca e-mail como lido
+                
+                # Ordenar o rascunho após processar o lote atual
+                if draft_id:
+                    sort_draft_content(access_token, draft_id)
             
-            log(f"Processados {len(emails)} e-mails. Aguardando 5 minutos...")
+            log(f"Processados {len(emails)} e-mails. Aguardando 1 minuto...")
             # Sleep em pequenos intervalos para permitir interrupção rápida
-            for i in range(300, 0, -1):
+            for i in range(60, 0, -1):
                 if STOP_MONITOR: 
                     update_timer(0)
                     break

@@ -1,0 +1,17 @@
+# Configuração de Segurança e Limpeza Platinum
+.env
+token.json
+token_graph.json
+*.pyc
+__pycache__/
+build/
+dist/
+*.spec
+*.xlsx
+# Manter apenas um .xlsx se for banco de dados essencial, caso contrário ignorar
+!CALCULO_ST_DIFAL_COMPLETA.xlsx
+xpdf-tools-win-4.06/
+# Ignorar arquivos de sistema do Windows
+Thumbs.db
+desktop.ini
+.DS_Store

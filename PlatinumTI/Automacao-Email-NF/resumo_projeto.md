@@ -6,12 +6,14 @@ Este sistema moderniza e automatiza o fluxo de recebimento, extração e organiz
 
 1.  **Monitoramento Digital**: Utiliza a API Microsoft Graph para monitorar a pasta `#NFE PLATINUM` no Outlook sem precisar do Outlook Desktop aberto.
 2.  **Extração de Dados Inteligente**: Analisa anexos PDF para extrair automaticamente **Número da NF**, **Pedido** e **Protocolo**.
+    *   **Validação Dupla**: O sistema valida se a NF pertence à **CLARO / NXT** via corpo do e-mail E via conteúdo do PDF, garantindo 100% de precisão e ignorando outros clientes (ex: Brasilcenter).
 3.  **Organização Automática**:
     *   Cria pastas dentro do projeto: `Notas-Salvas-xml-email\[Dados da NF]`.
     *   Cria uma pasta `Carregadas ao portal` para controle manual do usuário.
 4.  **Gestão de Fluxo**:
     *   Marca e-mails como **lidos** após o processamento.
-    *   Mantém um rascunho vivo no Outlook (**NOTAS CARREGADAS NO PORTAL**) com a lista detalhada de todas as NFs processadas no dia.
+    *   Processamento veloz em lotes de até **50 e-mails**.
+    *   Mantém um rascunho vivo no Outlook (**NOTAS CARREGADAS NO PORTAL**) com a lista de NFs e uma **lista limpa de protocolos** ao final para facilitar a cópia rápida.
 5.  **Interface Gráfica (GUI V2)**:
     *   Painel moderno com log em tempo real.
     *   Botões de **Iniciar/Pausar** sincronização.
@@ -33,4 +35,4 @@ O projeto foi consolidado em uma versão estável que pode ser distribuída como
 *   Toda a configuração de chaves do Azure (Client ID/Secret) já está injetada no motor do sistema.
 
 > [!NOTE]
-> Para o funcionamento correto da leitura de PDFs, o software **pdftotext** deve estar instalado e configurado no PATH do Windows.
+> Para o funcionamento correto da leitura de PDFs, o software **pdftotext** deve estar instalado e configurado no PATH do Windows ou presente na pasta de dependências do projeto.
