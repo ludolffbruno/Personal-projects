@@ -1,87 +1,33 @@
 # 🌬️🦾 Vendedor Imortal — Outlook AI Agent
 
-Agente de IA que vive dentro do Microsoft Outlook e age como o "braço direito" de um vendedor de alta performance. Lê pedidos de orçamento, gera rascunhos personalizados e marca e-mails como "Platinum Sales" — automaticamente.
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python)
+![Gemini](https://img.shields.io/badge/Gemini-8E75C2?style=flat&logo=googlegemini&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-000?style=flat&logo=langchain&logoColor=white)
 
-## ✨ Funcionalidades
+## 🎯 O Problema de Negócio | Business Problem
+Vendedores de alta performance perdem horas valiosas triando e-mails, lendo anexos complexos e respondendo cotações repetitivas. O desafio é automatizar a triagem e o rascunho de respostas sem perder o "toque humano" e a personalização necessária para fechar vendas.
 
-- **Triagem Cirúrgica**: Distingue cotações reais de spam/newsletters com 95%+ de precisão
-- **Memória de Estilo**: Aprende como o vendedor escreve e replica seu tom de voz (ChromaDB)
-- **Visão Multimodal Avançada**: Lê pedidos em PDFs, Word (incluindo tabelas!), Imagens em anexo e até imagens coladas no corpo (Base64/Inline)
-- **Drafts Automáticos**: Salva rascunhos no Outlook preservando o histórico da conversa — o vendedor só clica em Enviar
-- **Failover Inteligente**: Se o Gemini atingir o limite de cota, o Groq assume a triagem e a visão (OCR) automaticamente
-- **Dashboard Premium**: Interface Dark Mode para monitorar o raciocínio da IA e logs de extração em tempo real
+## 💡 A Solução | The Solution
+Um agente de IA sofisticado que vive dentro do Microsoft Outlook. Ele age como um "braço direito", lendo pedidos de orçamento (mesmo em formatos complexos como imagens ou tabelas em PDFs), comparando com o histórico do vendedor para manter o tom de voz e gerando rascunhos automáticos. O vendedor apenas revisa e clica em enviar.
 
-## 🏗️ Arquitetura
+## 🚀 Principais Funcionalidades | Key Features
+- **Triagem Cirúrgica**: Distingue cotações reais de spam/newsletters com alta precisão.
+- **Visão Multimodal Avançada**: OCR integrado para ler pedidos em PDFs, Word, Imagens e até prints colados no corpo do e-mail.
+- **Memória de Estilo (RAG)**: Utiliza **ChromaDB** para aprender o padrão de escrita do usuário e replicá-lo nos rascunhos.
+- **Failover Inteligente**: Arquitetura resiliente que alterna entre **Gemini 2.5 Flash** e **Groq Llama 3.2** para garantir disponibilidade.
+- **Drafts Automáticos**: Salva rascunhos diretamente no Outlook via **MS Graph API**, preservando a thread original.
+- **Dashboard Premium**: Interface Dark Mode (Flask) para monitorar o "raciocínio" da IA e logs de extração.
 
-```
-Outlook (MS Graph) ──► Flask Dashboard ──► LangGraph Agent
-                                               ├── Gemini 2.5 Flash / Groq Llama 3.2 Vision
-                                               ├── ChromaDB (Memória de Estilo)
-                                               └── Parsers (PDF / Word Tables / Base64 Images)
-                        ◄────────────────── Drafts + Categorias
-```
+## 🛠️ Tecnologias Utilizadas | Tech Stack
+- **Python & LangGraph**: Orquestração de agentes inteligentes.
+- **Microsoft Graph API**: Integração profunda com o ecossistema M365.
+- **ChromaDB**: Banco de dados vetorial para memória de longo prazo.
+- **Flask**: Dashboard de monitoramento e controle.
+- **Gemini / Groq**: Motores de IA generativa de última geração.
 
-## 🚀 Setup
+## 💰 Custo Operacional: R$ 0/mês
+Projetado para rodar inteiramente em **Free Tiers** e soluções **Open Source**, permitindo alta performance sem custos fixos de API.
 
-### 1. Pré-requisitos
-- Python 3.11+
-- Conta Microsoft 365 (Outlook)
-- App Registration no Azure (já criado: `Outlook-AI-Agent`)
-- Chave da API Gemini (gratuita em [aistudio.google.com](https://aistudio.google.com))
-
-### 2. Instalação
-
-```bash
-# Clone / navegue até o projeto
-cd email-agent
-
-# Crie e ative o ambiente virtual
-python -m venv venv
-venv\Scripts\activate   # Windows
-
-# Instale as dependências
-pip install -r requirements.txt
-```
-
-### 3. Configuração
-
-```bash
-# Copie o template de ambiente
-copy .env.example .env
-```
-
-Edite o `.env` e preencha:
-- `AZURE_CLIENT_SECRET` — Crie em: Azure Portal > App registrations > Outlook-AI-Agent > Certificates & secrets
-- `GEMINI_API_KEY` — Obtenha em: https://aistudio.google.com/app/apikey
-- `FLASK_SECRET_KEY` — Qualquer string longa e aleatória
-
-### 4. Permissões Azure (Obrigatório)
-
-No Portal Azure, vá em **App registrations > Outlook-AI-Agent > API permissions** e adicione:
-
-| Permission | Type | Admin Consent |
-|---|---|---|
-| `Mail.Read` | Delegated | ✅ |
-| `Mail.ReadWrite` | Delegated | ✅ |
-| `Mail.Send` | Delegated | ✅ (para ler Sent Items) |
-| `MailboxSettings.Read` | Delegated | ✅ |
-
-### 5. Executar
-
-```bash
-python ui_server.py
-```
-
-Acesse: **http://localhost:5001**
-
-## 💰 Custo Operacional
-
-| Componente | Plano | Custo |
-|---|---|---|
-| Gemini 2.5 Flash | Free Tier (15 req/min) | **R$ 0** |
-| Groq (Llama 3.3) | Free Tier (High Speed) | **R$ 0** |
-| ChromaDB | Local (em disco) | **R$ 0** |
-| Microsoft Graph | Incluído no M365 | **R$ 0** |
-| Flask | Open Source | **R$ 0** |
-
-**Custo total: R$ 0/mês** 🎉 (Open Source & Free Tier Focused)
+---
+> [!IMPORTANT]
+> Este projeto demonstra a aplicação prática de IA Generativa para ganho de escala em processos de vendas B2B.
