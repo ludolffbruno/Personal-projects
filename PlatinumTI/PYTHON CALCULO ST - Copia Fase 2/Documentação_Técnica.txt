@@ -1,0 +1,132 @@
+### **Documentação Técnica Completa**
+
+---
+
+## **1. Descrição Geral**
+
+Este programa foi desenvolvido para auxiliar no cálculo do custo final de produtos com base em dados de aquisição, origem, e incidência de ST (Substituição Tributária). Ele utiliza uma interface gráfica para facilitar a entrada de dados e processa as informações com base em uma planilha Excel (`CALCULO_ST.xlsx`), aplicando fórmulas específicas de acordo com os parâmetros fornecidos.
+
+### **Funcionalidades**
+- Entrada de dados: NCM, tipo de aquisição, origem, inclusão de ST e custo unitário.
+- Processamento: Busca de informações na planilha `CALCULO_ST.xlsx` e cálculo do custo final.
+- Exibição do resultado na interface gráfica.
+- Tratamento de erros, como valores inválidos e planilha não encontrada.
+
+---
+
+## **2. Pré-requisitos**
+
+### **Software Necessário**
+- **Sistema Operacional**: Windows 10 ou 11.
+- **Python**: Versão 3.8 ou superior.
+- **Bibliotecas Python**:
+  - `tkinter` (incluso no Python padrão).
+  - `openpyxl` (para manipulação da planilha Excel).
+
+### **Arquivo Necessário**
+- Planilha `CALCULO_ST.xlsx`, formatada conforme os requisitos:
+  - Coluna A: NCM.
+  - Colunas G-I: Percentuais de incidência (importada, nacional e RJ).
+  - Outras colunas adicionais usadas para fórmulas específicas.
+
+---
+
+## **3. Instruções de Instalação**
+
+### **Instalando Python e Bibliotecas**
+1. **Baixe e instale o Python**:
+   - Acesse [python.org](https://www.python.org) e baixe a versão mais recente.
+   - Durante a instalação, habilite a opção **"Add Python to PATH"**.
+   
+2. **Instale as bibliotecas necessárias**:
+   Abra o terminal ou prompt de comando e execute:
+   ```bash
+   pip install openpyxl
+   ```
+
+### **Configuração Inicial**
+1. Salve a planilha `CALCULO_ST.xlsx` na mesma pasta onde o código do programa será executado.
+2. Certifique-se de que a planilha contém os dados corretos (verifique o formato das colunas e os percentuais).
+
+---
+
+## **4. Estrutura do Código**
+
+### **Componentes do Código**
+#### **Interface Gráfica (Tkinter)**
+- Responsável por coletar dados do usuário e exibir resultados.
+- Campos de entrada:
+  - **NCM**, **Aquisição**, **Origem**, **ST Inclusa**, **Custo Unitário**.
+- Botão de ação: **Consultar** para calcular o custo final.
+
+#### **Processamento (OpenPyXL)**
+- Lê a planilha `CALCULO_ST.xlsx` para buscar os dados correspondentes ao NCM informado.
+- Aplica as fórmulas específicas de cálculo:
+  - **Custo ST Interestadual**: Dependente do tipo de aquisição e origem.
+  - **Custo ST Interna**: Aplicado apenas para aquisições internas.
+
+#### **Tratamento de Erros**
+- **Erros de Entrada**:
+  - Valores inválidos, campos vazios ou não numéricos.
+- **Erros de Arquivo**:
+  - Planilha não encontrada ou mal formatada.
+
+---
+
+### **Fluxo de Funcionamento**
+1. Usuário insere os dados na interface.
+2. Programa busca informações na planilha com base no NCM.
+3. Fórmulas são aplicadas para calcular o custo final.
+4. Resultado exibido na interface gráfica.
+
+---
+
+## **5. Guia para Desenvolvedores**
+
+### **Como Extender o Programa**
+1. **Adicionar Novos Campos**:
+   - Inclua novos campos de entrada na interface.
+   - Ajuste as fórmulas de cálculo, se necessário.
+
+2. **Alterar a Planilha**:
+   - Certifique-se de atualizar o código para refletir alterações no formato ou nas colunas da planilha.
+
+3. **Adicionar Logs**:
+   - Implemente um sistema de registro para salvar entradas e resultados em um arquivo de texto.
+
+### **Estrutura do Código**
+O programa está estruturado em um único arquivo Python com funções modulares:
+- `calcular_custo`: Realiza o cálculo com base na planilha.
+- Blocos de interface gráfica separados por seções lógicas.
+
+---
+
+### **Possíveis Erros e Correções**
+#### **Erro: Planilha não encontrada**
+- Certifique-se de que o arquivo `CALCULO_ST.xlsx` está na mesma pasta do programa.
+
+#### **Erro: NCM não encontrado**
+- Verifique se o NCM digitado corresponde ao formato da planilha (sem pontos ou espaços).
+
+#### **Erro: Valores Inválidos**
+- Certifique-se de que os campos estão preenchidos corretamente e com valores numéricos.
+
+---
+
+## **Exemplo Prático**
+
+1. **Entrada de Dados**:
+   - NCM: `12345678`
+   - Aquisição: `EXTERNA`
+   - Origem: `IMPORTADA`
+   - ST Inclusa: `NÃO`
+   - Custo Unitário: `100,00`
+
+2. **Processamento**:
+   - Busca o NCM `12345678` na planilha.
+   - Aplica as fórmulas conforme as colunas de incidência e tipo de aquisição.
+
+3. **Resultado**:
+   - Exibido na interface: **"CUSTO FINAL: R$ 121,19"**.
+
+---

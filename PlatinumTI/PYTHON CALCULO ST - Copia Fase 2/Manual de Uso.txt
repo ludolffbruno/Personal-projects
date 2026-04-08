@@ -1,0 +1,85 @@
+---
+
+## **Esquema do Projeto de Cálculo de ST/DIFAL para Compras**
+
+### **1. Objetivo do Projeto**
+O programa tem como objetivo calcular o **custo final de compra** de produtos, levando em conta os impostos **ST (Substituição Tributária)** e **DIFAL (Diferencial de Alíquota)**. Ele utiliza uma planilha de dados (`CALCULO_ST_DIFAL_COMPLETA.xlsx`) como base e permite ao usuário buscar produtos ou NCMs, configurar opções de cálculo e obter resultados de forma interativa.
+
+---
+
+### **2. Funcionalidades Principais**
+- **Busca de NCM ou Produto**: Campo para pesquisar por código NCM ou nome do produto.
+- **Seleção de NCM**: Exibe automaticamente informações como "ST / DIFAL" (C/ST ou S/ST).
+- **Opção "ST Inclusa na Compra"**: Disponível para NCMs classificados como "C/ST", permite indicar se o imposto já foi recolhido.
+- **Escolha de "Origem ICMS"**: Configuração manual para casos "S/ST" ou "C/ST" com "ST Inclusa" desmarcada.
+- **Cálculo do Custo Final**: Combina custo unitário, impostos ST e possíveis reduções de imposto.
+- **Cópia do Resultado**: Botão para copiar o custo final calculado para a área de transferência.
+- **Limpeza de Campos**: Reinicia o programa para novos cálculos.
+- **Tutorial Interativo**: Botão "ℹ️" no canto superior direito abre um pop-up com instruções de uso.
+
+---
+
+### **3. Lógica de Cálculo**
+O cálculo do custo final segue os seguintes passos:
+
+1. **Leitura da Planilha**:
+   - Carrega informações como "AQUISIÇÃO" (Interna/Externa), "ORIGEM", "ST INCLUSA", percentuais de ICMS e dados de redução de imposto.
+
+2. **Determinação do `origem_icms_value`**:
+   - **"C/ST" com "ST Inclusa" marcada**: Imposto zerado (0%).
+   - **"C/ST" com "ST Inclusa" desmarcada**: Usuário escolhe "Origem ICMS" (0%, 4%, 12%, 22%).
+   - **"S/ST"**: Usuário escolhe "Origem ICMS" (0%, 4%, 12%, 22%).
+
+3. **Cálculo dos Impostos**:
+   - **`custo_st_interes_estadual`**: Custo unitário × `origem_icms_value`.
+   - **`custo_st_interna`**: Custo unitário × (Origem RJ / 100), aplicado apenas se "AQUISIÇÃO" for "INTERNA" e "ST Inclusa" estiver desmarcada.
+
+4. **Custo Final**:
+   - Fórmula: `custo_final = custo_unitário + custo_st_interes_estadual + custo_st_interna`.
+   - Se houver redução de imposto (coluna "N" = "SIM"), subtrai o valor indicado na coluna "O".
+
+---
+
+### **4. Interface do Usuário**
+- **Campo de Busca**: Filtragem em tempo real ao digitar NCM ou nome do produto.
+- **Tabela de Resultados**: Lista NCMs e produtos encontrados, com seleção por clique.
+- **Campos Automáticos**:
+  - "NCM Selecionado": Mostra o NCM escolhido.
+  - "ST / DIFAL": Exibe "C/ST" ou "S/ST".
+- **Checkbox "ST Inclusa na Compra"**: Habilitado apenas para "C/ST".
+- **Combobox "Origem ICMS"**: Disponível conforme a lógica de "ST Inclusa".
+- **Campo "Custo Unitário"**: Aceita valores numéricos (ex.: 123,45).
+- **Botões**:
+  - "Calcular": Executa o cálculo do custo final.
+  - "Copiar Custo": Copia o resultado para a área de transferência.
+  - "Limpar": Reseta todos os campos.
+- **Tutorial**: Botão "ℹ️" exibe pop-up com instruções.
+
+---
+
+### **5. Interações do Usuário**
+- **Buscar e Selecionar**:
+  - Digita no campo de busca.
+  - Clica na tabela para escolher um NCM/produto.
+- **Configurar Opções**:
+  - Marca ou desmarca "ST Inclusa na Compra" (se aplicável).
+  - Seleciona "Origem ICMS" no combobox, quando necessário.
+- **Inserir Custo Unitário**:
+  - Digita o valor e pressiona "Enter" ou clica em "Calcular".
+- **Copiar Resultado**:
+  - Clica em "Copiar Custo" para usar o valor calculado.
+- **Reiniciar**:
+  - Clica em "Limpar" para começar um novo cálculo.
+- **Acessar Ajuda**:
+  - Clica no botão "ℹ️" para ver o tutorial.
+
+---
+
+### **6. Sugestões de Melhorias Futuras**
+- **Ícones Gráficos**: Usar a biblioteca `PIL` para adicionar ícones visuais ao botão de tutorial.
+- **Validação de Entrada**: Aceitar decimais com ponto ou vírgula no "Custo Unitário" e exibir erros mais claros.
+- **Feedback Detalhado**: Mostrar breakdown do cálculo (ex.: ST interestadual e interna) no resultado.
+- **Recarregar Planilha**: Adicionar botão para atualizar os dados da planilha sem reiniciar o programa.
+- **Melhor Tratamento de Erros**: Exibir mensagens específicas para NCMs não encontrados ou entradas inválidas.
+
+---
