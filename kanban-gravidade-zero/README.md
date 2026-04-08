@@ -110,6 +110,8 @@ http://localhost:5173
 
 ```
 kanban-gravidade-zero/
+├── assets/           # Imagens e assets de documentação
+│   └── dashboard.png # Screenshot do dashboard principal
 ├── backend/
 │   ├── index.ts          # Servidor HTTP + rotas REST
 │   ├── database.ts       # Conexão e schema SQLite
@@ -161,6 +163,10 @@ Base URL: `http://localhost:3030/api`
 
 ## 📸 Preview
 
+### Main Dashboard
+
+![Main Dashboard](assets/dashboard.png)
+
 > Board com tarefas reais distribuídas nas colunas **A Fazer**, **Em Progresso** e **Concluída**.
 
 O board suporta criação de colunas extras como **Revisão**, **Teste**, **Bloqueado**, conforme a necessidade do fluxo de trabalho.
@@ -186,7 +192,7 @@ O board suporta criação de colunas extras como **Revisão**, **Teste**, **Bloq
 
 ## 📄 Licença
 
-Este projeto está licensed sob a **MIT License** — sinta-se livre para usar, modificar e distribuir.
+Este projeto está licenciado sob a **MIT License** — sinta-se livre para usar, modificar e distribuir.
 
 ---
 
